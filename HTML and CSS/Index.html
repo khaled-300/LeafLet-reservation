@@ -20,21 +20,8 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
         integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
         crossorigin=""></script>
-    <script src="https://maps.google.com/maps/api/js?sensor=false&dummy=.js"></script>
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"
-        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -45,117 +32,9 @@
     <div id="image-map"></div>
     <img id="map" src="first-floor.png">
 
+    <script src="./reservation_list.js"></script>
+    <script src="./app.js"></script>
 
-    <script type="text/javascript">
-
-        // criando mapa
-        var map = L.map('image-map', {
-            minZoom: 1,
-            maxZoom: 5,
-            center: [0, 0],
-            zoom: 3,
-            crs: L.CRS.Simple,
-        });
-
-        // dimensões na imagem com url dela
-        var w = 2000,
-            h = 1500,
-            url = 'http://kempe.net/images/newspaper-big.jpg';
-
-
-
-        // caculando as lados da imagem com Coordenadas do spaco 
-        var southWest = map.unproject([0, h], map.getMaxZoom() - 1);
-        var northEast = map.unproject([w, 0], map.getMaxZoom() - 1);
-        var bounds = new L.LatLngBounds(southWest, northEast);
-
-        // aqui adicionado a imagem overlay para puder cobrir a mapa inteira mapa   
-        L.imageOverlay(document.getElementById('map'), bounds).addTo(map);
-
-        // manda para leaflet essa mapa para ficar como imagem grande
-        map.setMaxBounds(bounds);
-        //console.log(bounds)
-        // aqui a calcula width com height da imagem para puder pegar Coordenadas do click
-        function onMapClick(e) {
-            var mapWidth = map._container.offsetWidth;
-            var mapHeight = map._container.offsetHeight;
-            var locationX = e.containerPoint.x * w / mapWidth;
-            var locationY = e.containerPoint.y * h / mapHeight
-
-            console.log("x : " + locationX + "    y : " + locationY);
-            console.log(e.latlng.lng + ' : ' + e.latlng.lat)
-
-
-            if (e.latlng.lng.between(bounds._southWest.lng, bounds._northEast.lng) && e.latlng.lat.between(bounds._southWest.lat, bounds._northEast.lat)) {
-
-                var obj = { mesa: reservationList.length + 1, lat: e.latlng.lat, lag: e.latlng.lng };
-                reservationList.push(obj);
-
-                L.Circle.include({
-                    contains: function (latLng) {
-                        return this.getLatLng().distanceTo(latLng) < this.getRadius();
-                    }
-                });
-
-                var greenIcon = L.icon({
-                    iconUrl: 'https://png2.cleanpng.com/sh/231d7ed31f29fc6f8a8921d63dd49ec7/L0KzQYm3UsA0N5R1fZH0aYP2gLBuTf9nbppofZ9sbHnzPbL5lL14d6NwgdDwLYTydLLCTfNtcaFmiuZ8LUXkR4bqVvVkO5JrSdU8Lke1QIe9VsE5OWY2T6gBOEC6RoO7UcQveJ9s/kisspng-office-clip-art-working-today-cliparts-5a75c6ec3af1c3.7206661815176680762414.png',
-                    // shadowUrl: '',
-
-                    iconSize: [25, 25], // size of the icon
-                    shadowSize: [20, 20], // size of the shadow
-                    iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
-                    shadowAnchor: [13, 13],  // the same for the shadow
-                    popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
-                });
-
-                L.marker([e.latlng.lat, e.latlng.lng], { icon: greenIcon }).addTo(map).bindPopup('<p>Quer reservar essa mesa?</p> <button type="button"class="btn btn-primary btn-sm">Sim</button> <button type="button"class="btn btn-danger btn-sm">Não</button>');
-                // L.marker([e.latlng.lat, e.latlng.lng], {icon: redMarker}).addTo(map);
-                var circle = L.circle([e.latlng.lat, e.latlng.lng], 1).addTo(map);
-            } else
-                console.log("not okay")
-
-            //map.fitBounds(circle.getBounds());
-            console.log(reservationList);
-
-        }
-        console.log(reservationList);
-
-        //Hadnel on right click functions TODO: MOVE THIS LATER
-        map.on('contextmenu', onMapClick);
-
-        var reservationList = [];
-        reservationList.push({ mesa: 0, lat: -28.625, lng: 55.625 })
-        reservationList.push({ mesa: 1, lat: -28.4375, lng: 63.09375 })
-        reservationList.push({ mesa: 2, lat: -28.25, lng: 70.65625 })
-        reservationList.push({ mesa: 3, lat: -27.4375, lng: 84.65625 })
-        reservationList.push({ mesa: 4, lat: -27.625, lng: 95.21875 })
-
-
-        reservationList.forEach(element => {
-            var greenIcon = L.icon({
-                iconUrl: 'https://png2.cleanpng.com/sh/231d7ed31f29fc6f8a8921d63dd49ec7/L0KzQYm3UsA0N5R1fZH0aYP2gLBuTf9nbppofZ9sbHnzPbL5lL14d6NwgdDwLYTydLLCTfNtcaFmiuZ8LUXkR4bqVvVkO5JrSdU8Lke1QIe9VsE5OWY2T6gBOEC6RoO7UcQveJ9s/kisspng-office-clip-art-working-today-cliparts-5a75c6ec3af1c3.7206661815176680762414.png',
-                // shadowUrl: 'leaf-shadow.png',
-
-                iconSize: [25, 25], // size of the icon
-                shadowSize: [20, 20], // size of the shadow
-                iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
-                shadowAnchor: [13, 13],  // the same for the shadow
-                popupAnchor: [3, -12] // point from which the popup should open relative to the iconAnchor
-            });
-
-            L.marker([element.lat, element.lng], { icon: greenIcon }).addTo(map).bindPopup(
-                '<p>Quer reservar essa mesa?</p> <button type="button"class="btn btn-primary btn-sm">Sim</button> <button type="button"class="btn btn-danger btn-sm">Não</button>'
-            );
-            L.circle([element.lat, element.lng], 1).addTo(map);
-        });
-
-        Number.prototype.between = function (a, b) {
-            var min = Math.min.apply(Math, [a, b]),
-                max = Math.max.apply(Math, [a, b]);
-            return this > min && this < max;
-        };
-
-    </script>
 
 </body>
 
