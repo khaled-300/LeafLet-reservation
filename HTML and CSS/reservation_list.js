@@ -3,10 +3,10 @@ const reservationList = [
         "type": "Feature",
         "geometry": {
             "type": "Point",
-            "coordinates": [55.625, -28.625]
+            "coordinates": [55.625, -28.25]
         },
         "properties": {
-            "mesa": 0,
+            "id": 0,
             "name": "lucas",
             "occupation": "programmer",
             "phone": "23 2323 2323"
@@ -16,10 +16,10 @@ const reservationList = [
         "type": "Feature",
         "geometry": {
             "type": "Point",
-            "coordinates": [63.09375, -28.4375]
+            "coordinates": [63.09375, -28.25]
         },
         "properties": {
-            "mesa": 1,
+            "id": 1,
             "name": "pedro",
             "occupation": "programmer",
             "phone": "23 2323 0009"
@@ -32,7 +32,7 @@ const reservationList = [
             "coordinates": [70.65625, -28.25]
         },
         "properties": {
-            "mesa": 1,
+            "id": 2,
             "name": "khaled",
             "occupation": "programmer",
             "phone": "23 2323 0088"
