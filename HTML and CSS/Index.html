@@ -74,10 +74,9 @@
 
         // manda para leaflet essa mapa para ficar como imagem grande
         map.setMaxBounds(bounds);
-
+        //console.log(bounds)
         // aqui a calcula width com height da imagem para puder pegar Coordenadas do click
         function onMapClick(e) {
-
             var mapWidth = map._container.offsetWidth;
             var mapHeight = map._container.offsetHeight;
             var locationX = e.containerPoint.x * w / mapWidth;
@@ -86,38 +85,36 @@
             console.log("x : " + locationX + "    y : " + locationY);
             console.log(e.latlng.lng + ' : ' + e.latlng.lat)
 
-            // var obj = {mesa: i, lat : e.latlng.lat , lag : e.latlng.lng};
 
-            if (reservationList.length > 0) {
+            if (e.latlng.lng.between(bounds._southWest.lng, bounds._northEast.lng) && e.latlng.lat.between(bounds._southWest.lat, bounds._northEast.lat)) {
+
                 var obj = { mesa: reservationList.length + 1, lat: e.latlng.lat, lag: e.latlng.lng };
                 reservationList.push(obj);
-            } else {
-                var obj = { mesa: reservationList.length + 1, lat: e.latlng.lat, lag: e.latlng.lng };
-                reservationList.push(obj);
-            }
 
-            L.Circle.include({
-                contains: function (latLng) {
-                    return this.getLatLng().distanceTo(latLng) < this.getRadius();
-                }
-            });
+                L.Circle.include({
+                    contains: function (latLng) {
+                        return this.getLatLng().distanceTo(latLng) < this.getRadius();
+                    }
+                });
 
-            var greenIcon = L.icon({
-                iconUrl: 'https://png2.cleanpng.com/sh/231d7ed31f29fc6f8a8921d63dd49ec7/L0KzQYm3UsA0N5R1fZH0aYP2gLBuTf9nbppofZ9sbHnzPbL5lL14d6NwgdDwLYTydLLCTfNtcaFmiuZ8LUXkR4bqVvVkO5JrSdU8Lke1QIe9VsE5OWY2T6gBOEC6RoO7UcQveJ9s/kisspng-office-clip-art-working-today-cliparts-5a75c6ec3af1c3.7206661815176680762414.png',
-                // shadowUrl: '',
+                var greenIcon = L.icon({
+                    iconUrl: 'https://png2.cleanpng.com/sh/231d7ed31f29fc6f8a8921d63dd49ec7/L0KzQYm3UsA0N5R1fZH0aYP2gLBuTf9nbppofZ9sbHnzPbL5lL14d6NwgdDwLYTydLLCTfNtcaFmiuZ8LUXkR4bqVvVkO5JrSdU8Lke1QIe9VsE5OWY2T6gBOEC6RoO7UcQveJ9s/kisspng-office-clip-art-working-today-cliparts-5a75c6ec3af1c3.7206661815176680762414.png',
+                    // shadowUrl: '',
 
-                iconSize: [25, 25], // size of the icon
-                shadowSize: [20, 20], // size of the shadow
-                iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
-                shadowAnchor: [13, 13],  // the same for the shadow
-                popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
-            });
+                    iconSize: [25, 25], // size of the icon
+                    shadowSize: [20, 20], // size of the shadow
+                    iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
+                    shadowAnchor: [13, 13],  // the same for the shadow
+                    popupAnchor: [-3, -76] // point from which the popup should open relative to the iconAnchor
+                });
 
-            L.marker([e.latlng.lat, e.latlng.lng], { icon: greenIcon }).addTo(map).bindPopup('<p>Quer reservar essa mesa?</p> <button type="button"class="btn btn-primary btn-sm">Sim</button> <button type="button"class="btn btn-danger btn-sm">Não</button>');
-            // L.marker([e.latlng.lat, e.latlng.lng], {icon: redMarker}).addTo(map);
-            var circle = L.circle([e.latlng.lat, e.latlng.lng], 1).addTo(map);
+                L.marker([e.latlng.lat, e.latlng.lng], { icon: greenIcon }).addTo(map).bindPopup('<p>Quer reservar essa mesa?</p> <button type="button"class="btn btn-primary btn-sm">Sim</button> <button type="button"class="btn btn-danger btn-sm">Não</button>');
+                // L.marker([e.latlng.lat, e.latlng.lng], {icon: redMarker}).addTo(map);
+                var circle = L.circle([e.latlng.lat, e.latlng.lng], 1).addTo(map);
+            } else
+                console.log("not okay")
 
-            // map.fitBounds(circle.getBounds());
+            //map.fitBounds(circle.getBounds());
             console.log(reservationList);
 
         }
@@ -152,7 +149,11 @@
             L.circle([element.lat, element.lng], 1).addTo(map);
         });
 
-
+        Number.prototype.between = function (a, b) {
+            var min = Math.min.apply(Math, [a, b]),
+                max = Math.max.apply(Math, [a, b]);
+            return this > min && this < max;
+        };
 
     </script>
 
