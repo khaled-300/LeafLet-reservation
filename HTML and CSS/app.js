@@ -156,12 +156,17 @@ Number.prototype.between = function (a, b) {
 };
 
 
-function getAnimatedIcon(iconrUrl) {
+function getAnimatedIcon(feature) {
+    var url = getUrl(feature)
+    var type = feature.properties.type
+    var className = `location-pin-${type}`
+    var animationClass = `pulse-${type}`
+    console.log(animationClass);
     return L.divIcon({
-        className: 'location-pin',
+        className: className,
         html: `
-        <img src=${iconrUrl}>
-        <div class="pulse"></div>
+        <img src=${url}>
+        <div class=${animationClass}></div>
         `,
         // iconSize: [25, 25],//size being set in css.
         iconAnchor: [10, 10],
@@ -182,8 +187,8 @@ function generateMarkers(draggable, id = -1) {
 
             // if id is passed we need to animate the icon
             if (id != -1 && feature.properties.id === id) {
-                var url = feature.properties.reserved ? reservedDeskIconUrl : vacantDeskIconUrl
-                icon = getAnimatedIcon(url)
+
+                icon = getAnimatedIcon(feature)
             }
 
             var marker = L.marker(latlng, { icon: icon, draggable: draggable });
@@ -208,6 +213,14 @@ function generateMarkers(draggable, id = -1) {
     geoLayer.addTo(myMap);
     updateList()
     return geoLayer;
+}
+
+function getUrl(feature) {
+    if (feature.properties.type == 'desk') {
+        return feature.properties.reserved ? reservedDeskIconUrl : vacantDeskIconUrl;
+    }
+    return feature.properties.reserved ? reservedRoomIconUrl : vacantRoomIconUrl
+
 }
 
 function getIcon(feature) {
