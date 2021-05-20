@@ -1,34 +1,53 @@
-var editBttn = document.getElementById('edit-btn')
+var addDeskOrRoom = 'desk'
 var oldPosition = {}
 var isDraggable = false
+const floorImgUrl = './images/first-floor.png';
+const reservedDeskIconUrl = './images/icons/red-laptop.png';
+const vacantDeskIconUrl = './images/icons/green-laptop.png';
+const reservedRoomIconUrl = './images/icons/room2.png';
+const vacantRoomIconUrl = './images/icons/room.png';
 
 
-var newIcon = L.divIcon({
-    className: 'location-pin',
-    html: `
-        <img src='./green-laptop.png'>
-        <div class="pulse"></div>
-        `,
-    // iconSize: [25, 25],//size being set in css.
-    iconAnchor: [10, 10],
-
-    shadowSize: [20, 20], // size of the shadow
-    shadowAnchor: [13, 13],  // the same for the shadow
-    popupAnchor: [3, -12] // point from which the popup should open relative to the iconAnchor
-});
-
-
-var customIcon = L.icon({
-    // shadowUrl: 'leaf-shadow.png',
-    iconUrl: 'green-laptop.png',
+var reservedDeskIcon = L.icon({
+    iconUrl: reservedDeskIconUrl,
     iconSize: [25, 25], // size of the icon
     shadowSize: [20, 20], // size of the shadow
     iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
     shadowAnchor: [13, 13],  // the same for the shadow
     popupAnchor: [3, -12] // point from which the popup should open relative to the iconAnchor
 });
+
+
+var vacantDeskIcon = L.icon({
+    iconUrl: vacantDeskIconUrl,
+    iconSize: [25, 25], // size of the icon
+    shadowSize: [20, 20], // size of the shadow
+    iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
+    shadowAnchor: [13, 13],  // the same for the shadow
+    popupAnchor: [3, -12] // point from which the popup should open relative to the iconAnchor
+});
+
+var reservedRoomIcon = L.icon({
+    iconUrl: reservedRoomIconUrl,
+    iconSize: [50, 50], // size of the icon
+    shadowSize: [20, 20], // size of the shadow
+    iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
+    shadowAnchor: [13, 13],  // the same for the shadow
+    popupAnchor: [3, -12] // point from which the popup should open relative to the iconAnchor
+});
+
+
+var vacantRoomIcon = L.icon({
+    iconUrl: vacantRoomIconUrl,
+    iconSize: [50, 50], // size of the icon
+    shadowSize: [20, 20], // size of the shadow
+    iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
+    shadowAnchor: [13, 13],  // the same for the shadow
+    popupAnchor: [3, -12] // point from which the popup should open relative to the iconAnchor
+});
+
 // criando mapa
-var map = L.map('image-map', {
+var myMap = L.map('map', {
     minZoom: 1,
     maxZoom: 5,
     center: [-456, -440],
@@ -42,36 +61,90 @@ var w = 2000, // careful with these numbers, as they change the position of the 
     h = 1500  // the markers were added , these numbers shouldnt be modified.
 // var w = 3350,
 // h = 2550,
-url = 'http://kempe.net/images/newspaper-big.jpg',
-    f1Url = 'f1.png';
-
 
 
 // caculando as lados da imagem com Coordenadas do spaco 
-var southWest = map.unproject([0, h], map.getMaxZoom() - 1);
-var northEast = map.unproject([w, 0], map.getMaxZoom() - 1);
+var southWest = myMap.unproject([0, h], myMap.getMaxZoom() - 1);
+var northEast = myMap.unproject([w, 0], myMap.getMaxZoom() - 1);
 var bounds = new L.LatLngBounds(southWest, northEast);
 
+
 // aqui adicionado a imagem overlay para puder cobrir a mapa inteira mapa   
-L.imageOverlay(document.getElementById('map'), bounds).addTo(map);
+L.imageOverlay(floorImgUrl, bounds).addTo(myMap);
 
 // manda para leaflet essa mapa para ficar como imagem grande
-map.setMaxBounds(bounds);
+myMap.setMaxBounds(bounds);
 //console.log(bounds)
 // aqui a calcula width com height da imagem para puder pegar Coordenadas do click
 
 console.log(reservationList);
 
 //Hadnel on right click functions TODO: MOVE THIS LATER
-map.on('contextmenu', onMapRightClick);
+myMap.on('contextmenu', onMapRightClick);
 
-map.on('click', onMapClick)
+myMap.on('click', onMapClick)
 
 // how geoJSON work https://leafletjs.com/examples/geojson/
 // this instance (variable) is only being used in the Edit button so we can remove 
 // the layer from the map and generate/add it again 
 var geoJson = generateMarkers(false);
 
+
+// adding toobox on the right side of the map
+var toolbox = L.control({ position: 'topright' });
+toolbox.onAdd = function (map) {
+    var container = document.createElement('div')
+    container.className = 'toolbox'
+
+    var editBtn = document.createElement('div')
+    editBtn.innerText = 'Edit'
+    editBtn.className = 'edit-btn'
+    editBtn.addEventListener('click', OnEditClick)
+
+    var radioFrom = document.createElement('form')
+    radioFrom.innerText = 'Add'
+    radioFrom.className = 'radio-form'
+
+    var inpRadioDesk = document.createElement('input')
+    inpRadioDesk.setAttribute('type', 'radio')
+    inpRadioDesk.setAttribute('name', 'type')
+    inpRadioDesk.setAttribute('id', 'desk')
+    inpRadioDesk.setAttribute('value', 'Desk')
+    inpRadioDesk.setAttribute('checked', 'true')
+
+    var deskRadio = document.createElement('label')
+    deskRadio.htmlFor = 'desk';
+
+    deskRadio.appendChild(inpRadioDesk)
+    deskRadio.appendChild(document.createTextNode('Desk'));
+
+    var inpRadioRoom = document.createElement('input')
+    inpRadioRoom.setAttribute('type', 'radio')
+    inpRadioRoom.setAttribute('name', 'type')
+    inpRadioRoom.setAttribute('id', 'room')
+    inpRadioRoom.setAttribute('value', 'Metting Room')
+
+    var roomRadio = document.createElement('label')
+    roomRadio.htmlFor = 'room';
+
+    roomRadio.appendChild(inpRadioRoom)
+    roomRadio.appendChild(document.createTextNode('room'));
+
+    deskRadio.addEventListener('click', function (e) {
+        addDeskOrRoom = 'desk'
+    })
+    roomRadio.addEventListener('click', function (e) {
+        addDeskOrRoom = 'room'
+    })
+
+    radioFrom.appendChild(deskRadio)
+    radioFrom.appendChild(roomRadio)
+
+    container.appendChild(editBtn)
+    container.appendChild(radioFrom)
+    return container
+}
+toolbox.addTo(myMap)
 
 
 
@@ -82,21 +155,37 @@ Number.prototype.between = function (a, b) {
     return this > min && this < max;
 };
 
-editBttn.addEventListener('click', OnEditClick)
 
-function generateMarkers(draggable, id = -1, newIcon) {
+function getAnimatedIcon(iconrUrl) {
+    return L.divIcon({
+        className: 'location-pin',
+        html: `
+        <img src=${iconrUrl}>
+        <div class="pulse"></div>
+        `,
+        // iconSize: [25, 25],//size being set in css.
+        iconAnchor: [10, 10],
+
+        shadowSize: [20, 20],
+        shadowAnchor: [13, 13],
+        popupAnchor: [3, -12]
+    });
+}
+
+function generateMarkers(draggable, id = -1) {
 
     const geoLayer = L.geoJSON(reservationList, {
-        onEachFeature: forEachItem,
+        onEachFeature: onEachFeature,
         pointToLayer: function (feature, latlng) {
-            var icon = customIcon
-            if (id != -1) {
-                if (feature.properties.id === id) {
-                    console.log('found id checking feature, id:', id);
-                    console.log(feature);
-                    icon = newIcon
-                }
+            // set the icon based on the value of reserved.
+            var icon = getIcon(feature)
+
+            // if id is passed we need to animate the icon
+            if (id != -1 && feature.properties.id === id) {
+                var url = feature.properties.reserved ? reservedDeskIconUrl : vacantDeskIconUrl
+                icon = getAnimatedIcon(url)
             }
+
             var marker = L.marker(latlng, { icon: icon, draggable: draggable });
             marker.on('moveend', onMarkerDragged); // moveEnd is same as dragEnd (the later happens multiple times dont know why)
             // just testing dbClick, (problem double click also make zoom if it was not on the marker)
@@ -110,27 +199,39 @@ function generateMarkers(draggable, id = -1, newIcon) {
             return marker;
         }
     });
-    geoLayer.addTo(map);
+
+    // if layer exists remove it and render it again
+    if (myMap.hasLayer(geoJson)) {
+        myMap.removeLayer(geoJson)
+    }
+
+    geoLayer.addTo(myMap);
     updateList()
     return geoLayer;
 }
 
+function getIcon(feature) {
+    if (feature.properties.type == 'desk') {
+        return feature.properties.reserved ? reservedDeskIcon : vacantDeskIcon;
+    }
+    return feature.properties.reserved ? reservedRoomIcon : vacantRoomIcon;
+}
+
 function OnEditClick(e) {
     e.preventDefault();
+    var editBtn = e.target
 
     // to disable/enable draggable on each marker in the map layer, 
     // need to remove them and create them with draggable false/true. this is what worked with me.
-    if (editBttn.innerText == 'Edit') {
+    if (editBtn.innerText == 'Edit') {
 
-        editBttn.innerText = 'Save'
-        map.removeLayer(geoJson)
+        editBtn.innerText = 'Save'
         isDraggable = !isDraggable
         geoJson = generateMarkers(isDraggable)
 
     } else {
 
-        editBttn.innerText = 'Edit'
-        map.removeLayer(geoJson)
+        editBtn.innerText = 'Edit'
         isDraggable = !isDraggable
         geoJson = generateMarkers(isDraggable)
 
@@ -188,8 +289,8 @@ function onMapRightClick(e) {
     if (!isDraggable) {
         return
     }
-    var mapWidth = map._container.offsetWidth;
-    var mapHeight = map._container.offsetHeight;
+    var mapWidth = myMap._container.offsetWidth;
+    var mapHeight = myMap._container.offsetHeight;
     var locationX = e.containerPoint.x * w / mapWidth;
     var locationY = e.containerPoint.y * h / mapHeight
 
@@ -199,6 +300,7 @@ function onMapRightClick(e) {
 
     if (e.latlng.lng.between(bounds._southWest.lng, bounds._northEast.lng) && e.latlng.lat.between(bounds._southWest.lat, bounds._northEast.lat)) {
 
+        var type = addDeskOrRoom
         obj = {
 
             "type": "Feature",
@@ -208,9 +310,11 @@ function onMapRightClick(e) {
             },
             "properties": {
                 "id": reservationList.length + 1,
-                "name": "Destk " + reservationList + 1,
+                "type": type,
+                "name": "Desk " + reservationList + 1,
                 "name": "empty",
-                "phone": "emtpy"
+                "phone": "emtpy",
+                "reserved": false,
             }
         }
         // only need to add the coordinates and let generateMarkers do the work.
@@ -224,23 +328,41 @@ function onMapRightClick(e) {
 
 }
 
-function forEachItem(feature, layer) {
+function onEachFeature(feature, layer) {
     layer.bindPopup(makePopupContent(feature), { closeButton: false, offset: L.point(0, -8) });
 }
 
-function makePopupContent(desk) {
+function makePopupContent(feature) {
+    var typeName = feature.properties.type == 'desk' ? "mesa" : "sala"
+    if (feature.properties.reserved) {
+        return `
+        <div>
+                    <h3> ${typeName} ${feature.properties.id}</h3>
+                    <h4>${feature.properties.name}</h4>
+                    <p>${feature.properties.occupation}</p>
+                    <div class="phone-number">
+                        <a href="tel:${feature.properties.phone}">${feature.properties.phone}</a>
+                    </div>
+                </div>
+                <p> a ${typeName} já está reservada, Você quer cancelar a reserva? </p>
+                <button type="button" class="btn btn-primary btn-sm">Sim</button>
+                <button type="button" class="btn btn-danger btn-sm">Não</button>
+        `;
+    }
+
     return `
         <div>
-            <h4>${desk.properties.name}</h4>
-            <p>${desk.properties.occupation}</p>
-            <div class="phone-number">
-                <a href="tel:${desk.properties.phone}">${desk.properties.phone}</a>
-            </div>
-        </div>
-        <p>Quer reservar essa mesa?</p> 
-        <button type="button"class="btn btn-primary btn-sm">Sim</button> 
-        <button type="button"class="btn btn-danger btn-sm">Não</button>
-    `;
+                    <h3> ${typeName} ${feature.properties.id}</h3>
+                    <h4>${feature.properties.name}</h4>
+                    <p>${feature.properties.occupation}</p>
+                    <div class="phone-number">
+                        <a href="tel:${feature.properties.phone}">${feature.properties.phone}</a>
+                    </div>
+                </div>
+                <p>Quer reservar essa ${typeName}?</p>
+                <button type="button" class="btn btn-primary btn-sm">Sim</button>
+                <button type="button" class="btn btn-danger btn-sm">Não</button>
+        `;
 }
 
 function updateList() {
@@ -271,7 +393,7 @@ function updateList() {
 
 function animateMarker(desk) {
     const id = desk.properties.id
-    map.removeLayer(geoJson)
+    myMap.removeLayer(geoJson)
     // always assign it to this variable, to be able to remove it later. (otherwise strange things start happening, overlapping layers)
-    geoJson = generateMarkers(false, id, newIcon)
+    geoJson = generateMarkers(false, id)
 }
