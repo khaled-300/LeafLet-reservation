@@ -24,7 +24,7 @@ const reservationList = [
             "id": 1,
             "type": "desk",
             "name": "pedro",
-            "occupation": "programmer",
+            "occupation": "programador .Net Pleno p2",
             "phone": "23 2323 0009",
             "reserved": true,
         }
@@ -38,7 +38,7 @@ const reservationList = [
         "properties": {
             "id": 2,
             "type": "desk",
-            "name": "khaled",
+            "name": "khaled al jadaan",
             "occupation": "programmer",
             "phone": "23 2323 0088",
             "reserved": true,
@@ -54,8 +54,8 @@ const reservationList = [
         "properties": {
             "id": 3,
             "type": "room",
-            "name": "khaled",
-            "occupation": "programmer",
+            "name": "outback meeting",
+            "occupation": "product team",
             "phone": "23 2323 0088",
             "reserved": true,
         }
